@@ -1,0 +1,71 @@
+networks:
+  network_circ_peticionario:
+    external: true
+                
+volumes:
+  postgres_data:
+  node_modules:
+  payara_deploy: # Volume para o WAR
+
+services:
+
+  # PostgreSQL Database
+  data_base:
+    image: postgres:14
+    container_name: circ_peticionario_cnt_db
+    hostname: circ.peticionario.db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./DataBase/schema:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=proj_fapesp
+    ports:
+      - '5432:5432'     # Data base access
+    networks:
+      network_circ_peticionario:
+        ipv4_address: 192.168.101.10
+
+  # Node.js Application
+  srv_app:
+    build:
+      context: ./FrontEnd
+      dockerfile: Dockerfile
+    image: circ_peticionario_image_app  
+    container_name: circ_peticionario_cnt_app
+    hostname: circ.peticionario.app
+    working_dir: /app
+    environment:
+      - DB_HOST=db.eng.rev
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=proj_fapesp
+      - DB_PORT=5432
+      - PORT=80
+    ports:
+      - '80:80'         # Web Server - User entry point
+    depends_on:
+      - data_base
+    command: ["node", "index.js"]
+    networks:
+      network_circ_peticionario:
+        ipv4_address: 192.168.101.20
+
+  # Payara Server
+  payara:
+    build:
+      context: ./Payara
+      dockerfile: Dockerfile
+    image: circ_peticionario_image_payara
+    container_name: circ_peticionario_cnt_payara
+    hostname: circ.peticionario.payara
+    ports:
+      - '8080:8080'     # Web Server
+      - '4848:4848'     # Web consola de administração do Payara
+    environment:
+      - ADMIN_USER=admin
+      - ADMIN_PASSWORD=admin
+    networks:
+      network_circ_peticionario:
+        ipv4_address: 192.168.101.30
