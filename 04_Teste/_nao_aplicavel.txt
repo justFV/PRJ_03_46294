@@ -1,0 +1,1 @@
+A pasta "04_Teste" encontra-se vazia porque os testes realizados e os respetivos resultados estão documentados no relatório final do projeto, localizado na pasta "_RELATORIO" na raiz do repositório.

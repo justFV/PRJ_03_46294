@@ -1,0 +1,1 @@
+A diretoria "01_Analise" encontra-se vazia porque a análise de requisitos foi totalmente integrada no relatório final do projeto, localizado na raiz do repositório na pasta "_RELATORIO".
